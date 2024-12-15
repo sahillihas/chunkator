@@ -1,0 +1,1 @@
+from chunkator import sentence_split

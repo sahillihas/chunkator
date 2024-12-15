@@ -1,6 +1,6 @@
 # tests/test_split.py
 import unittest
-from sentence_split import sentence_split
+from chunkator import sentence_split
 
 class TestSentenceSplit(unittest.TestCase):
     def test_basic(self):
