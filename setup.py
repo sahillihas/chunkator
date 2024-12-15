@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="sentence-split",
+    name="sentence_split",
     version="0.0.1",
     description="A library for splitting text into sentences",
     long_description=open("README.md").read(),
