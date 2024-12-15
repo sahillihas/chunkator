@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="sentence_split",
+    name="sentence-split",
     version="0.0.1",
     description="A library for splitting text into sentences",
     long_description=open("README.md").read(),
@@ -10,7 +10,8 @@ setup(
     author="Sahil Sahil",
     author_email="sahil.lihas@ymail.com",
     url="https://github.com/sahillihas/sentence-split",
-    packages=find_packages(),
+    packages=find_packages(),  # Automatically finds all sub-packages
+    include_package_data=True,  # Ensures non-code files are included
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: License",
