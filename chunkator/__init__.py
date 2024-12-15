@@ -1,1 +1,1 @@
-from chunkator import sentence_split
+from .split import sentence_split
