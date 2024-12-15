@@ -1,2 +1,2 @@
 # sentence_split/__init__.py
-from .split import sentence_split
+from .sentence_split import sentence_split
