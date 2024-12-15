@@ -3,17 +3,17 @@ from setuptools import setup, find_packages
 
 setup(
     name="sentence-split",
-    version="1.0.0",
+    version="0.0.1",
     description="A library for splitting text into sentences",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
-    author="Your Name",
-    author_email="your.email@example.com",
-    url="https://github.com/yourusername/sentence-split",
+    author="Sahil Sahil",
+    author_email="sahil.lihas@ymail.com",
+    url="https://github.com/sahillihas/sentence-split",
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: License",
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.6",
