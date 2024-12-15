@@ -115,6 +115,3 @@ print(sentences)
 We welcome contributions! Feel free to submit issues or pull requests to help us improve `sentence-split`.
 
 ---
-
-## License
-This project is licensed under the MIT License. See the `LICENSE` file for more details.
