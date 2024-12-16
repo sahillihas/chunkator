@@ -1,6 +1,11 @@
-# Chunkator - Get Good chunks !!!
+# Chunkator - Chunk it !
 
 Welcome to `chunkator`, a Python library designed for efficient and precise sentence segmentation. This library provides a robust alternative to existing tools like NLTK, LangChain, and LlamaIndex sentence splitters. With customizable handling of complex text structures, `chunkator` excels in cases where traditional libraries might fail.
+
+
+```bash
+pip install chunkator
+```
 
 ## Features
 - **High Accuracy**: Handles abbreviations, acronyms, websites, and edge cases like "Ph.D." without breaking sentences incorrectly.
@@ -79,7 +84,7 @@ pip install chunkator
 Here's how to use the `chunkator` library in your projects:
 
 ```python
-from sentence_split import sentence_split
+from chunkator import sentence_split
 
 # Input text
 text = "Dr. Smith is a leading scientist. He earned his Ph.D. in Physics. Visit www.example.com for more info."
