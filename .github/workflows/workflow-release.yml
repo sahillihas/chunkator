@@ -1,4 +1,4 @@
-name: Publish 🐍 distribution to PyPI 📦 and Github Release
+name: Publish 🐍 distribution to PyPI 📦 and Github
 
 on:
   push:
@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/chunkator  # Replace <package-name> with your PyPI project name
+      url: https://pypi.org/p/chunkator
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
 
