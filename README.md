@@ -16,7 +16,7 @@ pip install chunkator
 ---
 
 ## Why `chunkator`?
-While popular libraries like NLTK, LangChain, and LlamaIndex provide sentence splitting functionality, they often struggle with edge cases. Here's why `chunkator` stands out:
+While popular libraries like NLTK, LangChain, and LlamaIndex provide sentence-splitting functionality, they often struggle with edge cases. Here's why `chunkator` stands out:
 
 ### **1. Handling Abbreviations**
 `chunkator` processes abbreviations like "Dr.", "Mr.", and "Ph.D." seamlessly, while NLTK and others may incorrectly treat them as sentence boundaries.
