@@ -1,4 +1,4 @@
-# Chunkator - Chunk it !!
+# Chunkator - Chunk it !!!
 
 Welcome to `chunkator`, an open-source Python library for efficient and precise sentence segmentation. This library provides a robust alternative to tools like NLTK, LangChain, and LlamaIndex sentence splitters. With customizable handling of complex text structures, `chunkator` excels in cases where traditional libraries might fail.
 
