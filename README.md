@@ -143,12 +143,3 @@ We welcome contributions! Feel free to:
 Together, let's make Chunkator the best text processing library out there!
 
 ---
-
-## 📜 License
-
-This project is licensed under the [MIT License](LICENSE). Feel free to use, modify, and distribute it as per the terms.
-
----
-
-Start chunking smarter with **Chunkator** today! 🚀
-```
