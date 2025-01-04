@@ -27,7 +27,7 @@ pip install chunkator
 
 While tools like NLTK, LangChain, and LlamaIndex provide sentence-splitting functionality, they often fail to handle edge cases effectively. Chunkator excels in:
 
-### 1️⃣ **Abbreviation Handling**
+### 1️ **Abbreviation Handling**
 
 Chunkator correctly processes abbreviations like "Dr.", "Ph.D.", and "U.S.A.", avoiding improper splits.
 
@@ -47,7 +47,7 @@ Dr. Smith is a leading scientist. He earned his Ph.D. in Physics.
 
 ---
 
-### 2️⃣ **Website and Email Parsing**
+### 2️ **Website and Email Parsing**
 
 Chunkator keeps URLs and email addresses intact, unlike other libraries that often split them erroneously.
 
@@ -67,7 +67,7 @@ Visit our website at www.example.com. Contact us at support@example.com.
 
 ---
 
-### 3️⃣ **Ellipses and Multi-Dot Patterns**
+### 3️ **Ellipses and Multi-Dot Patterns**
 
 Chunkator handles ellipses (...) and similar patterns with precision.
 
@@ -87,7 +87,7 @@ She hesitated... but eventually agreed. It was unexpected...
 
 ---
 
-### 4️⃣ **Efficiency**
+### 4️ **Efficiency**
 
 Optimized for performance, Chunkator processes large documents faster than traditional libraries, thanks to precompiled regex patterns.
 
