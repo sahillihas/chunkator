@@ -60,6 +60,7 @@ def sentence_split(text: str) -> list[str]:
     text = text.replace("?", "?<stop>")
     text = text.replace("!", "!<stop>")
     
+    # Replace placeholders with actual periods
     text = text.replace("<prd>", ".")
     
     sentences = text.split("<stop>")
