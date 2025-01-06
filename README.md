@@ -6,7 +6,6 @@ Welcome to **Chunkator**, your go-to open-source Python library for accurate and
 
 ## 🔧 Installation
 
-Install Chunkator via pip:
 
 ```bash
 pip install chunkator
