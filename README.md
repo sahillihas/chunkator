@@ -13,7 +13,7 @@ pip install chunkator
 
 ---
 
-## 🌟 Key Features
+## 🌟 Features
 
 - **High Accuracy**: Handles abbreviations (e.g., "Ph.D."), acronyms, and URLs without breaking sentences incorrectly.
 - **Regex-Driven**: Utilizes precompiled regex patterns for lightning-fast processing.
