@@ -22,7 +22,7 @@ pip install chunkator
 
 ---
 
-## 🚀 Why Chunkator?
+## 🚀 Why Chunkator??
 
 While tools like NLTK, LangChain, and LlamaIndex provide sentence-splitting functionality, they often fail to handle edge cases effectively. Chunkator excels in:
 
