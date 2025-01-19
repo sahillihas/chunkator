@@ -1,4 +1,4 @@
-# Chunkator - Chunk It Right !!!
+# Chunkator - Chunk It Right !!!!
 
 Welcome to **Chunkator**, your go-to open-source Python library for accurate and efficient sentence chunking. Built to outperform traditional chunking tools like NLTK, LangChain, and LlamaIndex, Chunkator handles complex text structures with ease, making it a reliable choice for all your text processing needs.
 
