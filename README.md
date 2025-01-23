@@ -131,7 +131,7 @@ Chunkator can be customized to handle domain-specific text structures. Modify th
 
 ---
 
-## 🤝 Contribute here
+## 🤝 You can Contribute here
 
 We welcome contributions! Feel free to:
 
@@ -139,6 +139,6 @@ We welcome contributions! Feel free to:
 - Create pull requests
 - Suggest improvements
 
-Together, let's make Chunkator the best text processing library out there!
+Together, let's make Chunkator the best text-processing library out there!
 
 ---
