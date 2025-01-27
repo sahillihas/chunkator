@@ -131,7 +131,7 @@ Chunkator can be customized to handle domain-specific text structures. Modify th
 
 ---
 
-## 🤝 You can Contribute here
+## 🤝 Please contribute
 
 We welcome contributions! Feel free to:
 
