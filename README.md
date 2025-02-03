@@ -94,7 +94,7 @@ Optimized for performance, Chunkator processes large documents faster than tradi
 
 ## 📖 Usage
 
-Using Chunkator is simple. Here's an example:
+Using Chunkator is simple. Here is an example:
 
 ```python
 from chunkator import sentence_split
