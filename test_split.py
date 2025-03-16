@@ -1,4 +1,4 @@
-# tests/test_split.py
+# Unit Tests
 import unittest
 from chunkator import sentence_split
 
