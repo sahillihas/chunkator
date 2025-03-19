@@ -14,7 +14,7 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 
-# Step 3: Create the new release tag
+# Step 3: Create  new release tag
 RELEASE_TAG="${VERSION}-release"
 echo "Creating tag: $RELEASE_TAG"
 git tag "$RELEASE_TAG"
