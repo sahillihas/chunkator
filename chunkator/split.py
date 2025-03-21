@@ -1,6 +1,6 @@
 import re
 
-# Regular expression patterns for different text components
+# ReGeX patterns for different text components
 alphabets = "([A-Za-z])"
 prefixes = "(Mr|St|Mrs|Ms|Dr)[.]"
 suffixes = "(Inc|Ltd|Jr|Sr|Co)"
