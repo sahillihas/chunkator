@@ -63,7 +63,7 @@ def sentence_split(text: str) -> list[str]:
     # Replace placeholders with actual periods
     text = text.replace("<prd>", ".")
     
-    # Split the text into sentences and trim whitespace
+    # Split the text into sentences and trim whitespace or tabs
     sentences = text.split("<stop>")
     sentences = [s.strip() for s in sentences if s.strip()]
 
