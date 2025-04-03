@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Checking if the working directory is clean !
+# Checking if the working directory is clean
 git status --porcelain | grep -q . && echo "Error: Working directory is not clean!" && exit 1
 
 # Step 1: Bump the version (You can change patch to minor or major based on your needs)
