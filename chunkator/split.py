@@ -8,21 +8,20 @@ starters = "(Mr|Mrs|Ms|Dr|Prof|Capt|Cpt|Lt|He\\s|She\\s|It\\s|They\\s|Their\\s|O
 acronyms = "([A-Z][.][A-Z][.](?:[A-Z][.])?)"
 websites = "[.](com|net|org|io|gov|edu|me)"
 digits = "([0-9])"
-multiple_dots = r'\\.{2,}'
+multiple_dots = r'\.{2,}'  # fixed escaping
 
 def sentence_split(text: str) -> list[str]:
     """
-    Splits the input text into a list of sentences based on punctuation and special rules.
-
-    Args:
-    text (str): The input text to be split.
-
-    Returns:
-    list[str]: A list of sentences.
+    Splits the input text into a list of sentences based on punctuation and special rules,
+    including rejoining hyphenated words split across lines.
     """
-    # Add spaces to ensure correct processing of the text
-    text = " " + text + "  "
+    # Preprocessing
     text = text.replace("\n", " ")  # Replace newlines with spaces
+    
+    # Handle hyphenated line breaks: remove hyphen and join words
+    text = re.sub(r'(\w+)-\s+(\w+)', r'\1\2', text)
+    
+    text = " " + text + "  "
     
     # Handle common abbreviations and patterns
     text = re.sub(prefixes, "\\1<prd>", text)
@@ -30,46 +29,40 @@ def sentence_split(text: str) -> list[str]:
     text = re.sub(digits + "[.]" + digits, "\\1<prd>\\2", text)
     text = re.sub(multiple_dots, lambda match: "<prd>" * len(match.group(0)) + "<stop>", text)
     
-    # Handle specific cases like "Ph.D."
     if "Ph.D" in text:
         text = text.replace("Ph.D.", "Ph<prd>D<prd>")
-
-    # Handle alphabetic abbreviations and acronyms
+    
     text = re.sub("\\s" + alphabets + "[.] ", " \\1<prd> ", text)
     text = re.sub(acronyms + " " + starters, "\\1<stop> \\2", text)
     text = re.sub(alphabets + "[.][.]" + alphabets + "[.]", "\\1<prd>\\2<prd>\\3<prd>", text)
     text = re.sub(alphabets + "[.][.]", "\\1<prd>\\2<prd>", text)
-    
-    # Handle suffixes and special starters
     text = re.sub(" " + suffixes + "[.] " + starters, " \\1<stop> \\2", text)
     text = re.sub(" " + suffixes + "[.]", " \\1<prd>", text)
     text = re.sub(" " + alphabets + "[.]", " \\1<prd>", text)
 
-    # Handle punctuation with quotes
-    if "”" in text:
-        text = text.replace(".”", "”.")
-    if "\"" in text:
-        text = text.replace(".\"", "\".")
-    if "!" in text:
-        text = text.replace("!\"", "\"!")
-    if "?" in text:
-        text = text.replace("?\"", "\"?")
+    # Punctuation with quotes
+    text = text.replace(".”", "”.")
+    text = text.replace(".\"", "\".")
+    text = text.replace("!\"", "\"!")
+    text = text.replace("?\"", "\"?")
     
-    # Add sentence stops
+    # Sentence stops
     text = text.replace(".", ".<stop>")
     text = text.replace("?", "?<stop>")
     text = text.replace("!", "!<stop>")
     
-    # Replace placeholders with actual periods
+    # Replace placeholders
     text = text.replace("<prd>", ".")
     
-    # Split the text into sentences and trim whitespace or tabs
+    # Final sentence list
     sentences = text.split("<stop>")
     sentences = [s.strip() for s in sentences if s.strip()]
-
+    
     return sentences
 
 # Example usage
 if __name__ == "__main__":
-    sample_text = "Dr. Smith is here. She has a Ph.D. in Chemistry. Hello... Is it working? Yes!"
+    sample_text = """Dr. Smith is here. She has a Ph.D. in Chemistry.
+The recom-
+mendation was ignored. Hello... Is it working? Yes!"""
     print(sentence_split(sample_text))
