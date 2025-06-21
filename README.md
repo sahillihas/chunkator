@@ -88,12 +88,8 @@ She hesitated... but eventually agreed. It was unexpected...
 
 ---
 
-### 5️ **Efficiency**
 
-Optimized for performance, Chunkator processes large documents faster than traditional libraries, thanks to precompiled regex patterns.
-
-
-### 5 **Page-Spanning Sentences**
+### 4️ **Page-Spanning Sentences**
 
 Chunkator intelligently reconstructs sentences broken across page boundaries and removes noisy page markers.
 
@@ -106,9 +102,11 @@ But this is a new sentence.
 ```
 Chunkator Output:
 
-``` ['This is a sentence that starts on one page and continues on the next.', 'But this is a new sentence.'] ```
+``` 
+['This is a sentence that starts on one page and continues on the next.', 'But this is a new sentence.']
+```
 
-### 6️ **Hyphenated Word Merging**
+### 5️ **Hyphenated Word Merging**
 
 Chunkator rejoins words split by hyphenation at line breaks.
 
@@ -120,7 +118,9 @@ mendation was accepted.
 ```
 Chunkator Output:
 
-``` ['The recommendation was accepted.'] ```
+``` 
+['The recommendation was accepted.']
+```
 ---
 
 ## 📖 Usage
