@@ -1,4 +1,4 @@
-# Chunkator - Chunk It Right !
+# Chunkator - Chunk It Right!
 
 Welcome to **Chunkator**, your go-to open-source Python library for accurate and efficient sentence chunking. Built to outperform traditional chunking tools like NLTK, LangChain, and LlamaIndex, Chunkator handles complex text structures with ease, making it a reliable choice for all your text processing needs.
 
@@ -16,8 +16,10 @@ pip install chunkator
 ## 🌟 Features
 
 - **High Accuracy**: Handles abbreviations (e.g., "Ph.D."), acronyms, and URLs without breaking sentences incorrectly.
-- **Regex-Driven**: Utilizes precompiled regex patterns for lightning-fast processing.
+- **Regex-Driven**: Utilises precompiled regex patterns for lightning-fast processing.
 - **Edge-Case Resilience**: Processes text with complex punctuation, initials, or special formatting reliably.
+- **Page-Aware Chunking**: Automatically merges sentences broken across pages and removes pagination artefacts like "Page 2 of 5".
+- **Hyphenation Handling**: Rejoins words split with hyphens at line breaks (e.g., "recom-\nmendation" → "recommendation").
 - **Lightweight**: Free of unnecessary dependencies, making it simple to integrate into any Python project.
 
 ---
@@ -86,10 +88,39 @@ She hesitated... but eventually agreed. It was unexpected...
 
 ---
 
-### 4️ **Efficiency**
+### 5️ **Efficiency**
 
 Optimized for performance, Chunkator processes large documents faster than traditional libraries, thanks to precompiled regex patterns.
 
+
+### 5 **Page-Spanning Sentences**
+
+Chunkator intelligently reconstructs sentences broken across page boundaries and removes noisy page markers.
+
+Example Input:
+
+```
+This is a sentence that starts on one page
+and continues on the next. Page 2 of 5
+But this is a new sentence.
+```
+Chunkator Output:
+
+``` ['This is a sentence that starts on one page and continues on the next.', 'But this is a new sentence.'] ```
+
+### 6️ **Hyphenated Word Merging**
+
+Chunkator rejoins words split by hyphenation at line breaks.
+
+Example Input:
+
+```
+The recom-
+mendation was accepted.
+```
+Chunkator Output:
+
+``` ['The recommendation was accepted.'] ```
 ---
 
 ## 📖 Usage
@@ -122,12 +153,13 @@ Chunkator can be customized to handle domain-specific text structures. Modify th
 
 ## 📊 Benchmarking
 
-| Library           | Abbreviations | Websites | Ellipses | Speed (ms for 1000 sentences) |
-|-------------------|---------------|----------|----------|------------------------------|
-| **NLTK**          | ❌            | ❌       | ⚠️        | 120                          |
-| **LangChain**     | ⚠️           | ❌       | ❌       | 150                          |
-| **LlamaIndex**    | ❌            | ⚠️       | ❌       | 130                          |
-| **Chunkator**     | ✅            | ✅       | ✅       | **90**                       |
+| Library        | Abbreviations | Websites | Ellipses | Hyphenation | Page-Aware | Speed (ms for 1000 sentences) |
+| -------------- | ------------- | -------- | -------- | ----------- | ---------- | ----------------------------- |
+| **NLTK**       | ❌             | ❌        | ⚠️       | ❌           | ❌          | 120                           |
+| **LangChain**  | ⚠️            | ❌        | ❌        | ❌           | ❌          | 150                           |
+| **LlamaIndex** | ❌             | ⚠️       | ❌        | ❌           | ❌          | 130                           |
+| **Chunkator**  | ✅             | ✅        | ✅        | ✅           | ✅          | **90**                        |
+
 
 ---
 
