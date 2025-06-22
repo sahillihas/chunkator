@@ -1,15 +1,15 @@
 import re
 from typing import List
 
-# Regex components
+# Regex components (with improved boundary handling)
 alphabets = r"([A-Za-z])"
-prefixes = r"(Mr|St|Mrs|Ms|Dr|Prof|Capt|Cpt|Lt)[.]"
-suffixes = r"(Inc|Ltd|Jr|Sr|Co)"
-starters = r"(Mr|Mrs|Ms|Dr|Prof|Capt|Cpt|Lt|He\s|She\s|It\s|They\s|Their\s|Our\s|We\s|But\s|However\s|That\s|This\s|Wherever)"
-acronyms = r"([A-Z][.](?:[A-Z][.])+)"  # e.g., U.S.A.
-websites = r"[.](com|net|org|io|gov|edu|me)"
+prefixes = r"\b(?:Mr|St|Mrs|Ms|Dr|Prof|Capt|Cpt|Lt)[.]"
+suffixes = r"\b(?:Inc|Ltd|Jr|Sr|Co)\b"
+starters = r"\b(?:Mr|Mrs|Ms|Dr|Prof|Capt|Cpt|Lt|He|She|It|They|Their|Our|We|But|However|That|This|Wherever)\b"
+acronyms = r"\b(?:[A-Z](?:[.][A-Z])+[.])"
+websites = r"[.](?:com|net|org|io|gov|edu|me)"
 digits = r"([0-9])"
-multiple_dots = r"\.{2,}"
+multiple_dots = r"\.{3,}"
 
 
 def sentence_split(text: str) -> List[str]:
@@ -18,60 +18,51 @@ def sentence_split(text: str) -> List[str]:
     Handles abbreviations, initials, websites, ellipses, and hyphenated line breaks.
     """
 
-    # Rejoin hyphenated words split across lines
+    # Join hyphenated words split across lines
     text = re.sub(r'(\w+)-\s+(\w+)', r'\1\2', text)
 
-    # Replace newlines with spaces
+    # Normalize line breaks
     text = text.replace("\n", " ")
 
-    # Pad text
+    # Pad text to simplify boundary handling
     text = " " + text + "  "
 
-    # Abbreviation and website protection
-    text = re.sub(prefixes, r"\1<prd>", text)
+    # Protect common patterns
+    text = re.sub(prefixes, lambda m: m.group(0).replace(".", "<prd>"), text)
     text = re.sub(websites, r"<prd>\1", text)
     text = re.sub(digits + r"[.]" + digits, r"\1<prd>\2", text)
-
-    # Ellipsis and multi-dot
-    text = re.sub(multiple_dots, lambda m: "<prd>" * len(m.group(0)) + "<stop>", text)
-
-    # Handle Ph.D.
     text = text.replace("Ph.D.", "Ph<prd>D<prd>")
 
-    # Initials like A.B.C.
+    # Ellipses: replace with marker and <stop>
+    text = re.sub(multiple_dots, "<ellip><stop>", text)
+
+    # Acronyms and initials
+    text = re.sub(acronyms + r" " + starters, lambda m: m.group(0).replace(".", "<prd>").replace(" ", "<stop> "), text)
     text = re.sub(r"\b([A-Z])[.]([A-Z])[.]", r"\1<prd>\2<prd>", text)
     text = re.sub(r"\b([A-Z])[.]", r"\1<prd>", text)
 
-    # Acronyms followed by sentence starters
-    text = re.sub(acronyms + r" " + starters, r"\1<stop> \2", text)
-
-    # Two dots in a row with alphabet, e.g., A..B.
-    text = re.sub(r"([A-Za-z])[.][.]([A-Za-z])[.]", r"\1<prd><prd>\2<prd>", text)
-    text = re.sub(r"([A-Za-z])[.][.]", r"\1<prd><prd>", text)
-
-    # Suffixes and starters
+    # Suffix handling
     text = re.sub(r" " + suffixes + r"[.] " + starters, r" \1<stop> \2", text)
     text = re.sub(r" " + suffixes + r"[.]", r" \1<prd>", text)
 
-    # Single letter abbreviations (e.g., E. coli)
+    # Handle single-letter abbreviations like E. coli
     text = re.sub(r"\s" + alphabets + r"[.] ", r" \1<prd> ", text)
     text = re.sub(r" " + alphabets + r"[.]", r" \1<prd>", text)
 
-    # Quote-safe punctuation replacements
-    text = text.replace(".”", "”.")
-    text = text.replace(".\"", "\".")
-    text = text.replace("!\"", "\"!")
-    text = text.replace("?\"", "\"?")
+    # Quote-safe punctuation
+    text = re.sub(r'([.!?])”', r'”\1', text)
+    text = re.sub(r'([.!?])"', r'"\1', text)
 
     # Mark sentence boundaries
     text = text.replace(".", ".<stop>")
     text = text.replace("?", "?<stop>")
     text = text.replace("!", "!<stop>")
 
-    # Restore protected periods
+    # Restore special placeholders
     text = text.replace("<prd>", ".")
+    text = text.replace("<ellip>", "...")
 
-    # Final sentence list
+    # Final split
     sentences = text.split("<stop>")
     return [s.strip() for s in sentences if s.strip()]
 
