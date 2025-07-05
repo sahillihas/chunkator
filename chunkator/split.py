@@ -2,81 +2,73 @@ import re
 import warnings
 from typing import List
 
-# Regex components (with improved boundary handling)
-alphabets = r"([A-Za-z])"
-prefixes = r"\b(?:Mr|St|Mrs|Ms|Dr|Prof|Capt|Cpt|Lt)[.]"
-suffixes = r"\b(?:Inc|Ltd|Jr|Sr|Co)\b"
-starters = r"\b(?:Mr|Mrs|Ms|Dr|Prof|Capt|Cpt|Lt|He|She|It|They|Their|Our|We|But|However|That|This|Wherever)\b"
-acronyms = r"\b(?:[A-Z](?:[.][A-Z])+[.])"
-websites = r"[.](?:com|net|org|io|gov|edu|me)"
-digits = r"([0-9])"
-multiple_dots = r"\.{3,}"
-
+# Precompile regex patterns
+PREFIXES = re.compile(r"\b(?:Mr|St|Mrs|Ms|Dr|Prof|Capt|Cpt|Lt)[.]")
+SUFFIXES = re.compile(r"\b(?:Inc|Ltd|Jr|Sr|Co)\b")
+STARTERS = re.compile(r"\b(?:Mr|Mrs|Ms|Dr|Prof|Capt|Cpt|Lt|He|She|It|They|Their|Our|We|But|However|That|This|Wherever)\b")
+ACRONYMS = re.compile(r"\b(?:[A-Z](?:[.][A-Z])+[.])")
+WEBSITES = re.compile(r"\.(com|net|org|io|gov|edu|me)")
+DIGITS = re.compile(r"(\d)[.](\d)")
+MULTIPLE_DOTS = re.compile(r"\.{3,}")
+INITIALS = re.compile(r"\b([A-Z])[.](?=[A-Z][.])")
+SINGLE_INITIAL = re.compile(r"\b([A-Z])[.]")
 
 def sentence_split(text: str) -> List[str]:
     """
     Splits input text into sentences using rule-based heuristics.
-    Includes error handling for robustness.
+    Returns a list of sentence strings.
     """
     if not isinstance(text, str):
         raise ValueError("Input must be a string.")
 
     try:
-        # Join hyphenated words split across lines
-        text = re.sub(r'(\w+)-\s+(\w+)', r'\1\2', text)
-
-        # Normalize line breaks
+        # Step 1: Clean and normalize
+        text = re.sub(r'(\w+)-\s+(\w+)', r'\1\2', text)  # recom- mendation → recommendation
         text = text.replace("\n", " ")
+        text = f" {text}  "
 
-        # Pad text to simplify boundary handling
-        text = " " + text + "  "
-
-        # Protect common patterns
-        text = re.sub(prefixes, lambda m: m.group(0).replace(".", "<prd>"), text)
-        text = re.sub(websites, r"<prd>\1", text)
-        text = re.sub(digits + r"[.]" + digits, r"\1<prd>\2", text)
+        # Step 2: Protect known non-boundary patterns
+        text = PREFIXES.sub(lambda m: m.group(0).replace(".", "<prd>"), text)
+        text = WEBSITES.sub(r"<prd>\1", text)
+        text = DIGITS.sub(r"\1<prd>\2", text)
         text = text.replace("Ph.D.", "Ph<prd>D<prd>")
 
-        # Ellipses: replace with marker and <stop>
-        text = re.sub(multiple_dots, "<ellip><stop>", text)
+        # Step 3: Handle ellipses
+        text = MULTIPLE_DOTS.sub("<ellip><stop>", text)
 
-        # Acronyms and initials
-        text = re.sub(acronyms + r" " + starters, lambda m: m.group(0).replace(".", "<prd>").replace(" ", "<stop> "), text)
-        text = re.sub(r"\b([A-Z])[.]([A-Z])[.]", r"\1<prd>\2<prd>", text)
-        text = re.sub(r"\b([A-Z])[.]", r"\1<prd>", text)
+        # Step 4: Acronyms, initials
+        text = ACRONYMS.sub(lambda m: m.group(0).replace(".", "<prd>"), text)
+        text = INITIALS.sub(r"\1<prd>", text)
+        text = SINGLE_INITIAL.sub(r"\1<prd>", text)
 
-        # Suffix handling
-        text = re.sub(r" " + suffixes + r"[.] " + starters, r" \1<stop> \2", text)
-        text = re.sub(r" " + suffixes + r"[.]", r" \1<prd>", text)
+        # Step 5: Suffix handling
+        text = re.sub(r" " + SUFFIXES.pattern + r"[.] (?=" + STARTERS.pattern + ")", r"<prd><stop>", text)
+        text = SUFFIXES.sub(lambda m: m.group(0).replace(".", "<prd>"), text)
 
-        # Handle single-letter abbreviations like E. coli
-        text = re.sub(r"\s" + alphabets + r"[.] ", r" \1<prd> ", text)
-        text = re.sub(r" " + alphabets + r"[.]", r" \1<prd>", text)
-
-        # Quote-safe punctuation
+        # Step 6: Fix quotes around punctuation
         text = re.sub(r'([.!?])”', r'”\1', text)
         text = re.sub(r'([.!?])"', r'"\1', text)
 
-        # Mark sentence boundaries
+        # Step 7: Sentence boundary markers
         text = text.replace(".", ".<stop>")
         text = text.replace("?", "?<stop>")
         text = text.replace("!", "!<stop>")
 
-        # Restore special placeholders
+        # Step 8: Restore placeholders
         text = text.replace("<prd>", ".")
         text = text.replace("<ellip>", "...")
 
-        # Final split
-        sentences = text.split("<stop>")
-        return [s.strip() for s in sentences if s.strip()]
+        # Step 9: Final sentence split
+        sentences = [s.strip() for s in text.split("<stop>") if s.strip()]
+        return sentences
 
     except re.error as regex_err:
-        warnings.warn(f"Regex processing failed: {regex_err}")
-        return [text.strip()]  # Return the original text as one sentence fallback
+        warnings.warn(f"[Regex Error] Failed during sentence splitting: {regex_err}")
+        return [text.strip()]
 
     except Exception as e:
-        warnings.warn(f"Unexpected error in sentence splitting: {e}")
-        return []  # Return empty if unrecoverable
+        warnings.warn(f"[Unexpected Error] Sentence splitting failed: {e}")
+        return []
 
 
 # Example usage
@@ -87,5 +79,5 @@ if __name__ == "__main__":
     mendation was ignored. U.S.A. is big. E. coli is common. Mr. J.R.R. Tolkien wrote many books.
     """
     result = sentence_split(sample_text)
-    for i, s in enumerate(result, 1):
-        print(f"{i}. {s}")
+    for i, sentence in enumerate(result, 1):
+        print(f"{i}. {sentence}")
