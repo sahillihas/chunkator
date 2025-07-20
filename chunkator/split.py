@@ -3,23 +3,25 @@ import warnings
 from typing import List
 
 # Precompiled regex patterns for performance and clarity
-PREFIXES = re.compile(r"\b(?:Mr|Mrs|Ms|Dr|Prof|Capt|Cpt|Lt|St)[.]")
+PREFIXES = re.compile(r"\b(?:Mr|Mrs|Ms|Dr|Prof|Capt|Cpt|Lt|St)\.")
 SUFFIXES = re.compile(r"\b(?:Inc|Ltd|Jr|Sr|Co)\b")
-STARTERS = re.compile(r"\b(?:Mr|Mrs|Ms|Dr|Prof|Capt|Cpt|Lt|He|She|It|They|Their|Our|We|But|However|That|This|Wherever)\b")
-ACRONYMS = re.compile(r"\b(?:[A-Z](?:[.][A-Z])+[.])")
-WEBSITES = re.compile(r"\.(com|net|org|io|gov|edu|me)\b")
-DIGITS = re.compile(r"(\d)[.](\d)")
+STARTERS = re.compile(
+    r"\b(?:Mr|Mrs|Ms|Dr|Prof|Capt|Cpt|Lt|He|She|It|They|Their|Our|We|But|However|That|This|Wherever)\b"
+)
+ACRONYMS = re.compile(r"\b(?:[A-Z]\.){2,}(?:[A-Z]\.?)?")
+WEBSITES = re.compile(r"\b(?:[\w\-]+\.)+(?:com|net|org|io|gov|edu|me)(?=\b|/)")
+DIGITS = re.compile(r"(\d)\.(\d)")
 MULTIPLE_DOTS = re.compile(r"\.{3,}")
-INITIALS = re.compile(r"\b([A-Z])[.](?=[A-Z][.])")
-SINGLE_INITIAL = re.compile(r"\b([A-Z])[.]")
+INITIALS = re.compile(r"\b([A-Z])\.(?=[A-Z]\.)")
+SINGLE_INITIAL = re.compile(r"\b([A-Z])\.")
 
 def sentence_split(text: str) -> List[str]:
     """
     Splits a text into sentences using rule-based heuristics.
-    
+
     Args:
         text (str): The input text.
-    
+
     Returns:
         List[str]: List of sentences.
     """
@@ -34,9 +36,9 @@ def sentence_split(text: str) -> List[str]:
 
         # Protect known non-boundary dots
         text = PREFIXES.sub(lambda m: m.group().replace('.', '<prd>'), text)
-        text = WEBSITES.sub(r"<prd>\1", text)
+        text = WEBSITES.sub(lambda m: m.group().replace('.', '<prd>'), text)
         text = DIGITS.sub(r"\1<prd>\2", text)
-        text = text.replace("Ph.D.", "Ph<prd>D<prd>")
+        text = re.sub(r'\bPh\.D\.?', 'Ph<prd>D<prd>', text)
 
         # Handle ellipses
         text = MULTIPLE_DOTS.sub("<ellip><stop>", text)
@@ -48,14 +50,10 @@ def sentence_split(text: str) -> List[str]:
 
         # Handle suffixes followed by sentence starters
         text = re.sub(
-            rf" {SUFFIXES.pattern}[.] (?={STARTERS.pattern})",
+            r'\b(?:Inc|Ltd|Jr|Sr|Co)\. (?=(?:Mr|Mrs|Ms|Dr|Prof|Capt|Cpt|Lt|He|She|It|They|Their|Our|We|But|However|That|This|Wherever)\b)',
             "<prd><stop>", text
         )
         text = SUFFIXES.sub(lambda m: m.group().replace('.', '<prd>'), text)
-
-        # Fix punctuation inside quotes
-        text = re.sub(r'([.!?])”', r'”\1', text)
-        text = re.sub(r'([.!?])"', r'"\1', text)
 
         # Mark sentence boundaries
         text = text.replace('.', '.<stop>')
