@@ -4,7 +4,7 @@ Welcome to **Chunkator**, your go-to open-source Python library for accurate and
 
 ---
 
-## 🔧 Installation
+## Installation
 
 
 ```bash
