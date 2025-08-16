@@ -4,7 +4,7 @@ from typing import List
 
 # Precompiled regex patterns
 PREFIXES = re.compile(r"\b(?:Mr|Mrs|Ms|Dr|Prof|Capt|Cpt|Lt|St)\.")
-SUFFIXES = re.compile(r"\b(?:Inc|Ltd|Jr|Sr|Co)\b")
+SUFFIXES = re.compile(r"\b(?:Inc|Ltd|Jr|Sr|Co)\.")
 STARTERS = re.compile(
     r"\b(?:Mr|Mrs|Ms|Dr|Prof|Capt|Cpt|Lt|He|She|It|They|Their|Our|We|But|However|That|This|Wherever)\b"
 )
@@ -15,28 +15,22 @@ MULTIPLE_DOTS = re.compile(r"\.{3,}")
 INITIALS = re.compile(r"\b([A-Z])\.(?=[A-Z]\.)")
 SINGLE_INITIAL = re.compile(r"\b([A-Z])\.")
 ABBREVIATIONS = re.compile(r'\b(?:e\.g|i\.e|etc)\.')
-COMMON_ABBR = re.compile(r'\b(?:No|vs|Rs)\.')
+COMMON_ABBR = re.compile(r'\b(?:No\.|vs\.|Rs\.)')
 
 def sentence_split(text: str) -> List[str]:
     """
     Splits a text into sentences using rule-based heuristics.
-
-    Args:
-        text (str): The input text.
-
-    Returns:
-        List[str]: List of sentences.
     """
     if not isinstance(text, str):
         raise ValueError("Input must be a string.")
 
     try:
         # Normalize and pad
-        text = re.sub(r'(\w+)-\s+(\w+)', r'\1\2', text)  # Fix line-wrap hyphens
+        text = re.sub(r'(\w+)-\s+(\w+)', r'\1\2', text)  # Fix hyphenated line breaks
         text = re.sub(r'\s+', ' ', text)  # Normalize whitespace
         text = f" {text.strip()}  "
 
-        # Protect non-boundary dots
+        # Protect non-boundary dots with <prd>
         text = PREFIXES.sub(lambda m: m.group().replace('.', '<prd>'), text)
         text = SUFFIXES.sub(lambda m: m.group().replace('.', '<prd>'), text)
         text = WEBSITES.sub(lambda m: m.group().replace('.', '<prd>'), text)
@@ -45,35 +39,34 @@ def sentence_split(text: str) -> List[str]:
         text = ABBREVIATIONS.sub(lambda m: m.group().replace('.', '<prd>'), text)
         text = COMMON_ABBR.sub(lambda m: m.group().replace('.', '<prd>'), text)
 
-        # Ellipses
-        text = MULTIPLE_DOTS.sub("<ellip><stop>", text)
+        # Ellipses (e.g. "...")
+        text = MULTIPLE_DOTS.sub('<ellip><stop>', text)
 
-        # Acronyms and initials
+        # Acronyms and initials (e.g., U.S.A. or J.R.R.)
         text = ACRONYMS.sub(lambda m: m.group().replace('.', '<prd>'), text)
         text = INITIALS.sub(r"\1<prd>", text)
         text = SINGLE_INITIAL.sub(r"\1<prd>", text)
-
-        # Join split initials like J. K. into J<prd>K<prd>
         text = re.sub(r'\b([A-Z])<prd> ([A-Z])<prd>', r'\1<prd>\2<prd>', text)
 
         # Suffixes followed by sentence starters
         text = re.sub(
             r'\b(?:Inc|Ltd|Jr|Sr|Co)<prd> (?=' + STARTERS.pattern + ')',
-            "<prd><stop>", text
+            '<prd><stop>', text
         )
 
-        # Handle punctuation followed by quote
-        text = re.sub(r'([.!?])(<stop>)("|\')', r'\1\3\2', text)
+        # Punctuation followed by quotes (e.g., ." or !')
+        text = re.sub(r'([.!?])("|\')', r'\1\2<stop>', text)
 
-        # Mark sentence boundaries
+        # Sentence boundaries
         text = text.replace('.', '.<stop>')
         text = text.replace('?', '?<stop>')
         text = text.replace('!', '!<stop>')
 
-        # Restore protected markers
+        # Restore protected tokens
         text = text.replace('<prd>', '.')
         text = text.replace('<ellip>', '...')
 
+        # Final split
         return [s.strip() for s in text.split('<stop>') if s.strip()]
 
     except re.error as regex_err:
