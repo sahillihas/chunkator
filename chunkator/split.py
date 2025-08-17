@@ -20,6 +20,12 @@ COMMON_ABBR = re.compile(r'\b(?:No\.|vs\.|Rs\.)')
 def sentence_split(text: str) -> List[str]:
     """
     Splits a text into sentences using rule-based heuristics.
+
+    Args:
+        text (str): The input text.
+
+    Returns:
+        List[str]: List of sentences.
     """
     if not isinstance(text, str):
         raise ValueError("Input must be a string.")
@@ -30,7 +36,7 @@ def sentence_split(text: str) -> List[str]:
         text = re.sub(r'\s+', ' ', text)  # Normalize whitespace
         text = f" {text.strip()}  "
 
-        # Protect non-boundary dots with <prd>
+        # Protect dots
         text = PREFIXES.sub(lambda m: m.group().replace('.', '<prd>'), text)
         text = SUFFIXES.sub(lambda m: m.group().replace('.', '<prd>'), text)
         text = WEBSITES.sub(lambda m: m.group().replace('.', '<prd>'), text)
@@ -39,10 +45,13 @@ def sentence_split(text: str) -> List[str]:
         text = ABBREVIATIONS.sub(lambda m: m.group().replace('.', '<prd>'), text)
         text = COMMON_ABBR.sub(lambda m: m.group().replace('.', '<prd>'), text)
 
-        # Ellipses (e.g. "...")
+        # Fix "No. 1" style patterns
+        text = re.sub(r'\bNo<prd>\s?(\d+)', r'No<prd> \1', text)
+
+        # Ellipses
         text = MULTIPLE_DOTS.sub('<ellip><stop>', text)
 
-        # Acronyms and initials (e.g., U.S.A. or J.R.R.)
+        # Acronyms and initials
         text = ACRONYMS.sub(lambda m: m.group().replace('.', '<prd>'), text)
         text = INITIALS.sub(r"\1<prd>", text)
         text = SINGLE_INITIAL.sub(r"\1<prd>", text)
@@ -54,20 +63,23 @@ def sentence_split(text: str) -> List[str]:
             '<prd><stop>', text
         )
 
-        # Punctuation followed by quotes (e.g., ." or !')
-        text = re.sub(r'([.!?])("|\')', r'\1\2<stop>', text)
+        # Add stop after protected abbreviations if followed by capital letter
+        text = re.sub(r'(e<prd>g|i<prd>e|etc)<prd>(?=\s+[A-Z])', r'\1<prd><stop>', text)
 
-        # Sentence boundaries
+        # Handle punctuation followed by quotes, only if followed by capital
+        text = re.sub(r'([.!?])("|\')(?=\s+[A-Z])', r'\1\2<stop>', text)
+
+        # Mark sentence boundaries
         text = text.replace('.', '.<stop>')
         text = text.replace('?', '?<stop>')
         text = text.replace('!', '!<stop>')
 
-        # Restore protected tokens
+        # Restore protected markers
         text = text.replace('<prd>', '.')
         text = text.replace('<ellip>', '...')
 
-        # Final split
-        return [s.strip() for s in text.split('<stop>') if s.strip()]
+        # Final clean and split
+        return [re.sub(r'\s+', ' ', s.strip()) for s in text.split('<stop>') if s.strip()]
 
     except re.error as regex_err:
         warnings.warn(f"[Regex Error] Sentence splitting failed: {regex_err}")
@@ -80,12 +92,12 @@ def sentence_split(text: str) -> List[str]:
 # Example usage
 if __name__ == "__main__":
     sample_text = (
-        "Dr. Smith has a Ph.D. in Chemistry... She said, \"It’s working!\" "
-        "Visit www.example.com for more info. "
-        "The recom-\nmendation was ignored. U.S.A. is big. "
-        "E. coli is common. Mr. J.R.R. Tolkien wrote many books. "
-        "Examples include e.g. Multani Mitti, i.e. Fuller’s Earth. "
-        "No. 1 on the list was Bhringraj."
+        'Dr. Smith has a Ph.D. in Chemistry... She said, "It’s working!" '
+        'Visit www.example.com for more info. '
+        'The recom-\nmendation was ignored. U.S.A. is big. '
+        'E. coli is common. Mr. J.R.R. Tolkien wrote many books. '
+        'Examples include e.g. Multani Mitti, i.e. Fuller’s Earth. '
+        'No. 1 on the list was Bhringraj. She said, "Really?" Then left.'
     )
     for i, sentence in enumerate(sentence_split(sample_text), 1):
         print(f"{i}. {sentence}")
